@@ -4,6 +4,7 @@ import { buildSchema } from "type-graphql";
 import { createConnection } from "typeorm";
 import { HelloResolver } from "./resolvers/HelloRes";
 import { RecipeResolver } from "./resolvers/RecipeRes";
+import { UserResolver } from "./resolvers/UserRes";
 import typeormConfig from "./typeorm-config";
 
 
@@ -24,7 +25,7 @@ const main = async () => {
     //Apollo GraphQL endpoint
     const apolloServer = new ApolloServer({
         schema: await buildSchema({
-            resolvers: [HelloResolver, RecipeResolver],
+            resolvers: [HelloResolver, RecipeResolver, UserResolver],
             validate: false,
         }),
         context: () => ({})

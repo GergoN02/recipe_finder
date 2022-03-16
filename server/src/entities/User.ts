@@ -1,11 +1,11 @@
 import { Field, ObjectType } from "type-graphql";
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { UserType } from "./types";
 
 
 @ObjectType()
 @Entity()
-export class User {
+export class User extends BaseEntity {
 
     @PrimaryGeneratedColumn()
     id!: number;
@@ -25,7 +25,7 @@ export class User {
     @Column({
         type: "enum",
         enum: UserType,
-        default: UserType.GHOST
+        default: UserType.REGULAR
     })
     user_type: UserType;
 
