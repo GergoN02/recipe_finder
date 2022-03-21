@@ -37,7 +37,7 @@ export class RegInfo {
 @InputType()
 export class LoginInfo {
     @Field()
-    user!: string;
+    user: string;
 
     @Field()
     password!: string;
@@ -48,7 +48,7 @@ export class UserResponse {
     @Field(() => [FieldError], { nullable: true })
     errors?: FieldError[];
 
-    @Field()
+    @Field({ nullable: true })
     user?: User;
 }
 

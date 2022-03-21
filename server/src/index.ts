@@ -6,6 +6,12 @@ import { HelloResolver } from "./resolvers/HelloRes";
 import { RecipeResolver } from "./resolvers/RecipeRes";
 import { UserResolver } from "./resolvers/UserRes";
 import typeormConfig from "./typeorm-config";
+import Redis from "ioredis";
+import session from "express-session";
+import { __prod__ } from "./env-vars";
+import { ServerContext } from "./types";
+
+import { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageDisabled } from 'apollo-server-core';
 
 
 const main = async () => {
@@ -22,18 +28,50 @@ const main = async () => {
     //Express back-end server
     const app = express();
 
+    //Redis Session Store
+    const RedisStore = require("connect-redis")(session);
+    const redis = new Redis();
+
+    app.use(
+        session({
+            name: "qid",
+            store: new RedisStore({
+                client: redis,
+                disableTouch: true
+            }),
+            cookie: {
+                maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years 
+                httpOnly: true,
+                sameSite: "lax", //CSRF
+                secure: __prod__
+            },
+            saveUninitialized: false,
+            secret: "random-secret",
+            resave: false
+        })
+    )
+
+
+
     //Apollo GraphQL endpoint
     const apolloServer = new ApolloServer({
+        plugins: [ // GraphQL old playground
+            process.env.NODE_ENV === 'production'
+                ? ApolloServerPluginLandingPageDisabled()
+                : ApolloServerPluginLandingPageGraphQLPlayground()
+        ],
         schema: await buildSchema({
             resolvers: [HelloResolver, RecipeResolver, UserResolver],
             validate: false,
         }),
-        context: () => ({})
+        context: ({ req, res }): ServerContext => ({ req, res })
     });
 
     await apolloServer.start();
     //Listen to GraphQL via express server
-    apolloServer.applyMiddleware({ app });
+    apolloServer.applyMiddleware({
+        app
+    });
 
     //Express port
     app.listen(4000), () => {
