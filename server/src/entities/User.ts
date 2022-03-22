@@ -7,6 +7,7 @@ import { UserType } from "./types";
 @Entity()
 export class User extends BaseEntity {
 
+    @Field()
     @PrimaryGeneratedColumn()
     id!: number;
 

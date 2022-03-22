@@ -10,6 +10,7 @@ import Redis from "ioredis";
 import session from "express-session";
 import { __prod__ } from "./env-vars";
 import { ServerContext } from "./types";
+import cors from "cors";
 
 import { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageDisabled } from 'apollo-server-core';
 
@@ -31,6 +32,12 @@ const main = async () => {
     //Redis Session Store
     const RedisStore = require("connect-redis")(session);
     const redis = new Redis();
+
+    app.use(
+        cors({
+            origin: "http://localhost:3000",
+            credentials: true,
+        }))
 
     app.use(
         session({
@@ -70,7 +77,8 @@ const main = async () => {
     await apolloServer.start();
     //Listen to GraphQL via express server
     apolloServer.applyMiddleware({
-        app
+        app,
+        cors: false,
     });
 
     //Express port

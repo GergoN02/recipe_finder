@@ -37,7 +37,7 @@ export class RegInfo {
 @InputType()
 export class LoginInfo {
     @Field()
-    user: string;
+    username: string;
 
     @Field()
     password!: string;

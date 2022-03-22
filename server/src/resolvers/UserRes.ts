@@ -65,6 +65,15 @@ export class UserResolver {
             }
         }
 
+        if (await User.findOne({ email: user_info.email })) {
+            return {
+                errors: [{
+                    field: "email",
+                    message: "email already registered"
+                }]
+            }
+        }
+
         const hashedPass = await argon2.hash(user_info.password)
         const user = User.create({ user_name: user_info.user_name, email: user_info.email, password: hashedPass });
         await user.save();
@@ -81,7 +90,7 @@ export class UserResolver {
         @Ctx() { req }: ServerContext
     ): Promise<UserResponse> {
         const userRepo = getCustomRepository(UserRepository);
-        const user = user_info.user.includes('@') ? await userRepo.findByEmail(user_info.user) : await userRepo.findByUserName(user_info.user);
+        const user = user_info.username.includes('@') ? await userRepo.findByEmail(user_info.username) : await userRepo.findByUserName(user_info.username);
         if (!user) {
             return {
                 errors: [{
