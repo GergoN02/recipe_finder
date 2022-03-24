@@ -2,6 +2,7 @@ import argon2 from "argon2";
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { getCustomRepository } from "typeorm";
 import { User } from "../entities/User";
+import { COOKIE_NAME } from "../env-vars";
 import { UserRepository } from "../repositories/UserRepo";
 import { ServerContext } from "../types";
 import { LoginInfo, RegInfo, UserResponse } from "./ResTypes";
@@ -114,5 +115,24 @@ export class UserResolver {
         req.session!.userId = user.id;
 
         return { user };
+    }
+
+    // LOGOUT
+
+    @Mutation(() => Boolean)
+    async logout(
+        @Ctx() { req, res }: ServerContext
+    ) {
+        return new Promise((resolve) => {
+            req.session?.destroy((err) => {
+                res.clearCookie(COOKIE_NAME)
+                if (err) {
+                    console.log(err);
+                    resolve(false);
+                    return;
+                }
+                resolve(true);
+            })
+        })
     }
 }

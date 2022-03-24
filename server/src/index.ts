@@ -8,7 +8,7 @@ import { UserResolver } from "./resolvers/UserRes";
 import typeormConfig from "./typeorm-config";
 import Redis from "ioredis";
 import session from "express-session";
-import { __prod__ } from "./env-vars";
+import { COOKIE_NAME, __prod__ } from "./env-vars";
 import { ServerContext } from "./types";
 import cors from "cors";
 
@@ -41,7 +41,7 @@ const main = async () => {
 
     app.use(
         session({
-            name: "qid",
+            name: COOKIE_NAME,
             store: new RedisStore({
                 client: redis,
                 disableTouch: true
