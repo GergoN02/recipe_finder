@@ -14,7 +14,7 @@ export const InputField: React.FC<InputFieldProps> = ({ label, size: _, ...props
         //!! converts empty text to falsy 
         <FormControl isInvalid={!!error}>
             <FormLabel htmlFor={field.name}>{label}</FormLabel>
-            <Input {...field} id={field.name} placeholder={field.name} />
+            <Input {...field} {...props} id={field.name} placeholder={field.name} />
             {error ? <FormErrorMessage>{error}</FormErrorMessage> : null}
         </FormControl>
     );

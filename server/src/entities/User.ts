@@ -1,6 +1,8 @@
-import { Field, ObjectType } from "type-graphql";
-import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { UserType } from "./types";
+import { Ctx, Field, ObjectType } from "type-graphql";
+import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { ServerContext } from "../types";
+import { Recipe } from "./Recipe";
+import { UserSavedRecipes } from "./UserSavedRecipe";
 
 
 @ObjectType()
@@ -23,14 +25,6 @@ export class User extends BaseEntity {
     password!: string;
 
     @Field()
-    @Column({
-        type: "enum",
-        enum: UserType,
-        default: UserType.REGULAR
-    })
-    user_type: UserType;
-
-    @Field()
     @CreateDateColumn()
     created_at: Date;
 
@@ -38,4 +32,11 @@ export class User extends BaseEntity {
     @UpdateDateColumn()
     updated_at: Date;
 
+    @OneToMany(() => UserSavedRecipes, ur => ur.user)
+    recipeConnection: Promise<UserSavedRecipes[]>;
+
+    @Field(() => [Recipe])
+    async recipes(@Ctx() { recipeLoader }: ServerContext): Promise<Recipe[]> {
+        return recipeLoader.load(this.id)
+    }
 }

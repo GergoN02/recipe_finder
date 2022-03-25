@@ -1,4 +1,4 @@
-import { Box, Button } from '@chakra-ui/react';
+import { Box, Button, useToast } from '@chakra-ui/react';
 import { Form, Formik } from 'formik';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -6,6 +6,7 @@ import { InputField } from '../components/InputField';
 import { Wrapper } from '../components/Wrapper';
 import { useRegisterMutation, WhoAmIDocument, WhoAmIQuery } from '../generated/graphql';
 import { convertErrorMsg } from '../utils/convertErrorMsg';
+import { withApollo } from '../utils/withApollo';
 
 interface registerProps {
 
@@ -14,6 +15,7 @@ interface registerProps {
 const Register: React.FC<registerProps> = ({ }) => {
     const router = useRouter();
     const [register] = useRegisterMutation();
+    const toast = useToast();
 
     return (
         <Wrapper variant='small'>
@@ -36,6 +38,12 @@ const Register: React.FC<registerProps> = ({ }) => {
                         setErrors(convertErrorMsg(response.data.register.errors));
                     } else if (response.data?.register.user) {
                         //Got User object in response
+                        toast({
+                            title: "Successful Registration",
+                            status: "success",
+                            duration: 3000,
+                            isClosable: false
+                        })
                         router.push("/");
                     }
                 }}
@@ -74,4 +82,4 @@ const Register: React.FC<registerProps> = ({ }) => {
     );
 }
 
-export default Register;
+export default withApollo({ ssr: false })(Register);

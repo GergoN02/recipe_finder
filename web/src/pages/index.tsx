@@ -1,4 +1,5 @@
 import { NavBar } from "../components/NavBar";
+import { withApollo } from "../utils/withApollo";
 
 
 
@@ -8,4 +9,4 @@ const Index = () => (
     </>
 );
 
-export default Index;
+export default withApollo({ ssr: true })(Index);

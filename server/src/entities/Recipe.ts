@@ -1,5 +1,6 @@
 import { Field, ObjectType } from "type-graphql";
-import { Entity, Column, PrimaryGeneratedColumn, BaseEntity, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { UserSavedRecipes } from "./UserSavedRecipe";
 
 
 @ObjectType() // For type-graphql API
@@ -9,6 +10,10 @@ export class Recipe extends BaseEntity {
     @Field()
     @PrimaryGeneratedColumn()
     id!: number;
+
+    @Field()
+    @Column()
+    recipe_author: number;
 
     @Field()
     @Column({ unique: true })
@@ -41,5 +46,8 @@ export class Recipe extends BaseEntity {
     @Field()
     @UpdateDateColumn()
     updated_at!: Date
+
+    @OneToMany(() => UserSavedRecipes, ur => ur.recipe)
+    userConnection: Promise<UserSavedRecipes[]>
 
 }

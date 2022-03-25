@@ -1,5 +1,5 @@
 import { useApolloClient } from '@apollo/client';
-import { Box, Button, Flex, Link } from '@chakra-ui/react';
+import { Box, Button, Flex, Link, useToast } from '@chakra-ui/react';
 import NextLink from "next/link";
 import React from 'react';
 import { useLogoutMutation, useWhoAmIQuery } from '../generated/graphql';

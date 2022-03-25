@@ -1,15 +1,19 @@
-import { Arg, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { Recipe } from "../entities/Recipe";
+import { UserSavedRecipes } from "../entities/UserSavedRecipe";
+import { ServerContext } from "../types";
 import { RecipeInput } from "./ResTypes";
 
 
 @Resolver()
 export class RecipeResolver {
 
-    //Returns all recipes
+    //Returns all recipes for user
     @Query(() => [Recipe])
-    async getRecipes(): Promise<Recipe[]> {
-        return Recipe.find();
+    async getRecipes(
+        @Ctx() { req }: ServerContext
+    ): Promise<Recipe[]> {
+        return Recipe.find(req.session!.userId);
     }
 
     //Returns one recipe
@@ -22,10 +26,27 @@ export class RecipeResolver {
 
     //Add New Recipe
     @Mutation(() => Recipe)
-    async addRecipe(
-        @Arg("input") recipe_input: RecipeInput
+    async addNewRecipe(
+        @Arg("input") recipe_input: RecipeInput,
+        @Ctx() { req }: ServerContext
     ): Promise<Recipe> {
-        return Recipe.create(recipe_input).save();
+        return Recipe.create({
+            ...recipe_input,
+            recipe_author: req.session!.userId,
+        }).save();
+    }
+
+    //Add Recipe to joint table
+    //For new recipe, addNewRecipe ==> get the returned JSON ==> addUserSavedRecipe with current session userId
+    //For recipe already in DB (different author) ==> find recipe ==> addUserSavedRecipe with current session userId
+
+    @Mutation(() => Boolean)
+    async addUserSavedRecipe(
+        @Arg("recipe_id") recipe_id: number,
+        @Arg("user_id") user_id: number
+    ) {
+        await UserSavedRecipes.create({ user_id, recipe_id }).save();
+        return true;
     }
 
     //Update Existing Recipe
@@ -43,12 +64,24 @@ export class RecipeResolver {
         return recipe;
     }
 
-    //Delete Recipe
+    //Delete Owned Recipe
     @Mutation(() => Recipe)
-    async deleteRecipe(
+    async deleteOwnedRecipe(
         @Arg("id") id: number
     ): Promise<Boolean> {
+        await UserSavedRecipes.delete(id);
         await Recipe.delete(id);
+        return true;
+    }
+
+    //Delete Saved Recipe
+
+    @Mutation(() => Recipe)
+    async deleteSavedRecipe(
+        @Arg("user_id") user_id: number,
+        @Arg("recipe_id") recipe_id: number
+    ): Promise<Boolean> {
+        await UserSavedRecipes.delete({ user_id: user_id, recipe_id: recipe_id });
         return true;
     }
 

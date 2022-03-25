@@ -1,5 +1,5 @@
 import { useApolloClient } from '@apollo/client';
-import { Box, Button } from '@chakra-ui/react';
+import { Box, Button, useToast } from '@chakra-ui/react';
 import { Form, Formik } from 'formik';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -7,6 +7,7 @@ import { InputField } from '../components/InputField';
 import { Wrapper } from '../components/Wrapper';
 import { useLoginMutation, useWhoAmIQuery, WhoAmIDocument, WhoAmIQuery } from '../generated/graphql';
 import { convertErrorMsg } from '../utils/convertErrorMsg';
+import { withApollo } from '../utils/withApollo';
 
 interface loginProps {
 
@@ -14,6 +15,7 @@ interface loginProps {
 
 const Login: React.FC<loginProps> = ({ }) => {
     const router = useRouter();
+    const toast = useToast();
     const [login] = useLoginMutation();
 
     return (
@@ -33,11 +35,16 @@ const Login: React.FC<loginProps> = ({ }) => {
                             })
                         }
                     });
-
                     if (response.data?.login.errors) {
                         setErrors(convertErrorMsg(response.data.login.errors));
                     } else if (response.data?.login.user) {
                         //Got User object in response
+                        toast({
+                            title: "Successful Login",
+                            status: "success",
+                            duration: 3000,
+                            isClosable: false
+                        })
                         router.push("/");
                     }
                 }}
@@ -70,4 +77,4 @@ const Login: React.FC<loginProps> = ({ }) => {
     );
 }
 
-export default Login;
+export default withApollo({ ssr: false })(Login);
