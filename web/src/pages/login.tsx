@@ -1,10 +1,11 @@
+import { useApolloClient } from '@apollo/client';
 import { Box, Button } from '@chakra-ui/react';
 import { Form, Formik } from 'formik';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { InputField } from '../components/InputField';
 import { Wrapper } from '../components/Wrapper';
-import { useLoginMutation } from '../generated/graphql';
+import { useLoginMutation, useWhoAmIQuery, WhoAmIDocument, WhoAmIQuery } from '../generated/graphql';
 import { convertErrorMsg } from '../utils/convertErrorMsg';
 
 interface loginProps {
@@ -20,7 +21,19 @@ const Login: React.FC<loginProps> = ({ }) => {
             <Formik
                 initialValues={{ username: "", password: "" }}
                 onSubmit={async (values, { setErrors }) => {
-                    const response = await login({ variables: values });
+                    const response = await login({
+                        variables: values,
+                        update: (caches, { data }) => { // Updating the cache for live reload
+                            caches.writeQuery<WhoAmIQuery>({
+                                query: WhoAmIDocument,
+                                data: {
+                                    __typename: "Query",
+                                    whoami: data?.login.user,
+                                }
+                            })
+                        }
+                    });
+
                     if (response.data?.login.errors) {
                         setErrors(convertErrorMsg(response.data.login.errors));
                     } else if (response.data?.login.user) {

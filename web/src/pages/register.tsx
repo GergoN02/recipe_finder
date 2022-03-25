@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import React from 'react';
 import { InputField } from '../components/InputField';
 import { Wrapper } from '../components/Wrapper';
-import { useRegisterMutation } from '../generated/graphql';
+import { useRegisterMutation, WhoAmIDocument, WhoAmIQuery } from '../generated/graphql';
 import { convertErrorMsg } from '../utils/convertErrorMsg';
 
 interface registerProps {
@@ -20,7 +20,18 @@ const Register: React.FC<registerProps> = ({ }) => {
             <Formik
                 initialValues={{ email: "", username: "", password: "" }}
                 onSubmit={async (values, { setErrors }) => {
-                    const response = await register({ variables: values });
+                    const response = await register({
+                        variables: values,
+                        update: (caches, { data }) => {
+                            caches.writeQuery<WhoAmIQuery>({
+                                query: WhoAmIDocument,
+                                data: {
+                                    __typename: 'Query',
+                                    whoami: data?.register.user,
+                                }
+                            })
+                        }
+                    });
                     if (response.data?.register.errors) {
                         setErrors(convertErrorMsg(response.data.register.errors));
                     } else if (response.data?.register.user) {
