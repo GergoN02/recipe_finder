@@ -13,6 +13,7 @@ import { ServerContext } from "./types";
 import cors from "cors";
 
 import { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageDisabled } from 'apollo-server-core';
+import { RecipeLoader } from "./utils/recipeLoader";
 
 
 const main = async () => {
@@ -71,7 +72,7 @@ const main = async () => {
             resolvers: [HelloResolver, RecipeResolver, UserResolver],
             validate: false,
         }),
-        context: ({ req, res }): ServerContext => ({ req, res })
+        context: ({ req, res }): ServerContext => ({ req, res, recipeLoader: RecipeLoader() })
     });
 
     await apolloServer.start();

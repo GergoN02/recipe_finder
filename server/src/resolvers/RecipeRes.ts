@@ -1,5 +1,6 @@
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { Recipe } from "../entities/Recipe";
+import { User } from "../entities/User";
 import { UserSavedRecipes } from "../entities/UserSavedRecipe";
 import { ServerContext } from "../types";
 import { RecipeInput } from "./ResTypes";
@@ -9,11 +10,11 @@ import { RecipeInput } from "./ResTypes";
 export class RecipeResolver {
 
     //Returns all recipes for user
-    @Query(() => [Recipe])
+    @Query(() => User, { nullable: true })
     async getRecipes(
         @Ctx() { req }: ServerContext
-    ): Promise<Recipe[]> {
-        return Recipe.find(req.session!.userId);
+    ) {
+        return User.findOne(req.session!.userId);
     }
 
     //Returns one recipe

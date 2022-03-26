@@ -35,8 +35,8 @@ export class User extends BaseEntity {
     @OneToMany(() => UserSavedRecipes, ur => ur.user)
     recipeConnection: Promise<UserSavedRecipes[]>;
 
-    @Field(() => [Recipe])
-    async recipes(@Ctx() { recipeLoader }: ServerContext): Promise<Recipe[]> {
-        return recipeLoader.load(this.id)
+    @Field(() => [Recipe], { nullable: true })
+    async savedRecipes(@Ctx() { recipeLoader }: ServerContext): Promise<Recipe[] | []> {
+        return recipeLoader!.load(this.id)
     }
 }
