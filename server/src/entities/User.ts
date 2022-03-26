@@ -36,7 +36,7 @@ export class User extends BaseEntity {
     recipeConnection: Promise<UserSavedRecipes[]>;
 
     @Field(() => [Recipe], { nullable: true })
-    async savedRecipes(@Ctx() { recipeLoader }: ServerContext): Promise<Recipe[] | []> {
+    async savedRecipes(@Ctx() { recipeLoader }: ServerContext): Promise<Recipe[]> {
         return recipeLoader!.load(this.id)
     }
 }
