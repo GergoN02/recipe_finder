@@ -9,17 +9,23 @@ export class RecipeInput {
     @Field()
     recipe_desc!: string;
 
-    @Field()
-    recipe_cat!: string;
-
     @Field(() => [String])
     ingredients!: String[];
 
     @Field(() => [String])
     quantities!: string[];
 
-    @Field()
-    recipe_img: string;
+    @Field({ nullable: true })
+    recipe_img?: string;
+
+    @Field({ nullable: true })
+    recipe_cat: number;
+
+    @Field({ nullable: true })
+    recipe_diet: number;
+
+    @Field({ nullable: true })
+    recipe_cuisine: number;
 }
 
 @InputType()

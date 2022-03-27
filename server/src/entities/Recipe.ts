@@ -1,5 +1,8 @@
 import { Field, ObjectType } from "type-graphql";
-import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Category } from "./Category";
+import { Cuisine } from "./Cuisine";
+import { Diet } from "./Diet";
 import { UserSavedRecipes } from "./UserSavedRecipe";
 
 
@@ -13,19 +16,27 @@ export class Recipe extends BaseEntity {
 
     @Field()
     @Column()
-    recipe_author: number;
+    recipe_author!: number;
 
     @Field()
-    @Column({ unique: true })
+    @Column()
     recipe_name!: string;
 
     @Field()
     @Column()
     recipe_desc!: string;
 
-    @Field()
-    @Column()
-    recipe_cat!: string;
+    // @Field()
+    // @Column({ nullable: true })
+    // recipe_category_id: number;
+
+    // @Field()
+    // @Column({ nullable: true })
+    // recipe_diet_id: number;
+
+    // @Field()
+    // @Column({ nullable: true })
+    // recipe_cuisine_id: number;
 
     @Field(() => [String])
     @Column("text", { array: true })
@@ -36,8 +47,8 @@ export class Recipe extends BaseEntity {
     quantities!: string[];
 
     @Field()
-    @Column()
-    recipe_img: string;
+    @Column({ nullable: true })
+    recipe_img?: string;
 
     @Field()
     @CreateDateColumn()
@@ -49,5 +60,14 @@ export class Recipe extends BaseEntity {
 
     @OneToMany(() => UserSavedRecipes, ur => ur.recipe)
     userConnection: Promise<UserSavedRecipes[]>
+
+    @ManyToOne(() => Cuisine, cuisine => cuisine.recipes)
+    cuisine!: Promise<Cuisine>;
+
+    @ManyToOne(() => Category, category => category.recipes)
+    category!: Promise<Category>;
+
+    @ManyToOne(() => Diet, diet => diet.recipes)
+    diet!: Promise<Diet>;
 
 }

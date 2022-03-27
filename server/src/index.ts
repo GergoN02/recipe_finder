@@ -14,6 +14,9 @@ import cors from "cors";
 
 import { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageDisabled } from 'apollo-server-core';
 import { RecipeLoader } from "./utils/recipeLoader";
+import { CategoryResolver } from "./resolvers/CategoryRes";
+import { DietResolver } from "./resolvers/DietRes";
+import { CuisineResolver } from "./resolvers/CuisineRes";
 
 
 const main = async () => {
@@ -69,7 +72,7 @@ const main = async () => {
                 : ApolloServerPluginLandingPageGraphQLPlayground()
         ],
         schema: await buildSchema({
-            resolvers: [HelloResolver, RecipeResolver, UserResolver],
+            resolvers: [HelloResolver, RecipeResolver, UserResolver, CategoryResolver, DietResolver, CuisineResolver],
             validate: false,
         }),
         context: ({ req, res }): ServerContext => ({ req, res, recipeLoader: RecipeLoader() })
