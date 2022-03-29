@@ -1,9 +1,11 @@
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
+import { createQueryBuilder, EntityManager, getManager } from "typeorm";
+import { Category } from "../entities/Category";
 import { Recipe } from "../entities/Recipe";
 import { User } from "../entities/User";
 import { UserSavedRecipes } from "../entities/UserSavedRecipe";
 import { ServerContext } from "../types";
-import { RecipeInput } from "./ResTypes";
+import { RecipeInput, TagsInput } from "./ResTypes";
 
 
 @Resolver()
@@ -36,6 +38,38 @@ export class RecipeResolver {
             recipe_author: req.session!.userId,
         }).save();
     }
+
+
+    @Mutation(() => Boolean)
+    async addRecipeTags(
+        @Arg("recipe_id") recipe_id: number,
+        @Arg("tags") tags: TagsInput
+    ): Promise<Boolean> {
+        const recipe = await Recipe.findOne(recipe_id);
+        const { id, ..._ } = recipe!;
+
+        await getManager().query(`
+        UPDATE table 
+        SET recipes = array_append(recipes, $1)
+        WHERE category = $2
+        `, [id, tags.category_id])
+
+        await getManager().query(`
+        UPDATE table 
+        SET recipes = array_append(recipes, $1)
+        WHERE cuisine = $2
+        `, [id, tags.cuisine_id])
+
+        await getManager().query(`
+        UPDATE table 
+        SET recipes = array_append(recipes, $1)
+        WHERE diet = $2
+        `, [id, tags.diet_id])
+
+        return true;
+
+    }
+
 
     //Add Recipe to joint table
     //For new recipe, addNewRecipe ==> get the returned JSON ==> addUserSavedRecipe with current session userId

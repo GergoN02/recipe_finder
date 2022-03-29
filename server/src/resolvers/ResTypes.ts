@@ -29,6 +29,20 @@ export class RecipeInput {
 }
 
 @InputType()
+export class TagsInput {
+
+    @Field()
+    category_id: number
+
+    @Field()
+    diet_id: number
+
+    @Field()
+    cuisine_id: number
+}
+
+
+@InputType()
 export class RegInfo {
     @Field()
     user_name!: string;
