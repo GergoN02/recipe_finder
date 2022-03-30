@@ -1,8 +1,10 @@
-import { Field, ObjectType } from "type-graphql";
-import { BaseEntity, Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Ctx, Field, ObjectType } from "type-graphql";
+import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { ServerContext } from "../types";
 import { Category } from "./Category";
-import { Cuisine } from "./Cuisine";
 import { Diet } from "./Diet";
+import { RecipeCategory } from "./RecipeCategory";
+import { RecipeDiet } from "./RecipeDiet";
 import { UserSavedRecipes } from "./UserSavedRecipe";
 
 
@@ -25,18 +27,6 @@ export class Recipe extends BaseEntity {
     @Field()
     @Column()
     recipe_desc!: string;
-
-    // @Field()
-    // @Column({ nullable: true })
-    // recipe_category_id: number;
-
-    // @Field()
-    // @Column({ nullable: true })
-    // recipe_diet_id: number;
-
-    // @Field()
-    // @Column({ nullable: true })
-    // recipe_cuisine_id: number;
 
     @Field(() => [String])
     @Column("text", { array: true })
@@ -61,13 +51,20 @@ export class Recipe extends BaseEntity {
     @OneToMany(() => UserSavedRecipes, ur => ur.recipe)
     userConnection: Promise<UserSavedRecipes[]>
 
-    @ManyToOne(() => Cuisine, cuisine => cuisine.recipes)
-    cuisine!: Promise<Cuisine>;
+    @OneToMany(() => RecipeCategory, cc => cc.recipe)
+    catConnection: Promise<RecipeCategory[]>;
 
-    @ManyToOne(() => Category, category => category.recipes)
-    category!: Promise<Category>;
+    // @OneToMany(() => RecipeDiet, dc => dc.recipe)
+    // dietConnection: Promise<RecipeDiet[]>;
 
-    @ManyToOne(() => Diet, diet => diet.recipes)
-    diet!: Promise<Diet>;
+    @Field(() => [Category], { nullable: true })
+    async recipeCategory(@Ctx() { categoryLoader }: ServerContext): Promise<Category[]> {
+        return categoryLoader!.load(this.id);
+    }
+
+    // @Field(() => Diet, { nullable: true })
+    // async recipeDiet(@Ctx() { dietLoader }: ServerContext): Promise<Diet[]> {
+    //     return dietLoader!.load(this.id);
+    // }
 
 }

@@ -1,6 +1,6 @@
 import { Field, ObjectType } from "type-graphql";
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { Recipe } from "./Recipe";
+import { RecipeCategory } from "./RecipeCategory";
 
 
 @ObjectType()
@@ -19,6 +19,6 @@ export class Category extends BaseEntity {
     @Column({ nullable: true })
     category_desc?: string;
 
-    @OneToMany(() => Recipe, recipe => recipe.category)
-    recipes: Promise<Recipe[]>;
+    @OneToMany(() => RecipeCategory, rc => rc.recipe)
+    recipeConnection: Promise<RecipeCategory[]>;
 }

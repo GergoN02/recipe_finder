@@ -17,15 +17,6 @@ export class RecipeInput {
 
     @Field({ nullable: true })
     recipe_img?: string;
-
-    @Field({ nullable: true })
-    recipe_cat: number;
-
-    @Field({ nullable: true })
-    recipe_diet: number;
-
-    @Field({ nullable: true })
-    recipe_cuisine: number;
 }
 
 @InputType()
@@ -36,9 +27,6 @@ export class TagsInput {
 
     @Field()
     diet_id: number
-
-    @Field()
-    cuisine_id: number
 }
 
 
