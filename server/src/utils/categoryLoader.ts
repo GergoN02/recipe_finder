@@ -9,7 +9,7 @@ const batchFunction = async (keys: number[]) => {
         join: {
             alias: "RecipeCategory",
             innerJoinAndSelect: {
-                category: "RecipeCategory.category"
+                recipe: "RecipeCategory.category"
             }
         },
         where: {
@@ -17,18 +17,17 @@ const batchFunction = async (keys: number[]) => {
         }
     });
 
-    const categoryMap: { [key: number]: Category[] } = {};
+    const recipeMap: { [key: number]: Category[] } = {};
 
     fetchedCategories.forEach(category => {
-        if (category.recipe_id in categoryMap) {
-            categoryMap[category.recipe_id].push((category as any).__category__)
+        if (category.recipe_id in recipeMap) {
+            recipeMap[category.recipe_id].push((category as any).__category__);
         } else {
-            categoryMap[category.recipe_id] = [(category as any).__category__]
+            recipeMap[category.recipe_id] = [(category as any).__category__];
         }
     });
 
-    return keys.map(recipe_id => categoryMap[recipe_id]);
+    return keys.map(recipe_id => recipeMap[recipe_id]);
 };
-
 
 export const CategoryLoader = () => new DataLoader(batchFunction);

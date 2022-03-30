@@ -21,4 +21,3 @@ export class UserSavedRecipes extends BaseEntity {
     recipe: Promise<Recipe>;
 }
 
-

@@ -1,7 +1,7 @@
 import { ApolloServer } from "apollo-server-express";
 import express from "express";
 import { buildSchema } from "type-graphql";
-import { createConnection } from "typeorm";
+import { createConnection, getConnection } from "typeorm";
 import { HelloResolver } from "./resolvers/HelloRes";
 import { RecipeResolver } from "./resolvers/RecipeRes";
 import { UserResolver } from "./resolvers/UserRes";
@@ -16,6 +16,7 @@ import { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandi
 import { RecipeLoader } from "./utils/recipeLoader";
 import { CategoryResolver } from "./resolvers/CategoryRes";
 import { DietResolver } from "./resolvers/DietRes";
+import { ApolloServerLoaderPlugin } from "type-graphql-dataloader";
 
 
 const main = async () => {
@@ -68,7 +69,10 @@ const main = async () => {
         plugins: [ // GraphQL old playground
             process.env.NODE_ENV === 'production'
                 ? ApolloServerPluginLandingPageDisabled()
-                : ApolloServerPluginLandingPageGraphQLPlayground()
+                : ApolloServerPluginLandingPageGraphQLPlayground(),
+            ApolloServerLoaderPlugin({
+                typeormGetConnection: getConnection,  // for use with TypeORM
+            }),
         ],
         schema: await buildSchema({
             resolvers: [HelloResolver, RecipeResolver, UserResolver, CategoryResolver, DietResolver],

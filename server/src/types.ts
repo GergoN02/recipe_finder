@@ -7,6 +7,8 @@ export type ServerContext = {
     req: Request; // Session cannot be undefined
     res: Response;
     recipeLoader?: ReturnType<typeof RecipeLoader>;
-    categoryLoader?: ReturnType<typeof CategoryLoader>;
-    dietLoader?: ReturnType<typeof dietLoader>
+    // categoryLoader?: ReturnType<typeof CategoryLoader>;
+    // dietLoader?: ReturnType<typeof dietLoader>
 };
+
+export type Lazy<T> = Promise<T> | T;

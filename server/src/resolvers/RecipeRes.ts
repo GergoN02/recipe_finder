@@ -1,4 +1,7 @@
-import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
+import { Arg, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from "type-graphql";
+import { Loader } from "type-graphql-dataloader";
+import { In } from "typeorm";
+import { Category } from "../entities/Category";
 import { Recipe } from "../entities/Recipe";
 import { RecipeCategory } from "../entities/RecipeCategory";
 import { RecipeDiet } from "../entities/RecipeDiet";
@@ -6,10 +9,33 @@ import { User } from "../entities/User";
 import { UserSavedRecipes } from "../entities/UserSavedRecipe";
 import { ServerContext } from "../types";
 import { RecipeInput, TagsInput } from "./ResTypes";
+import { groupBy } from "lodash";
 
 
 @Resolver()
 export class RecipeResolver {
+
+
+    //FIX THIS!!!
+
+
+    // @FieldResolver()
+    // @Loader<number, Category[]>(async (ids: number[]) => {
+    //     const categories = await Category.find({
+    //         where: {
+    //             id: In(ids)
+    //         }
+    //     })
+
+    //     const categoryMap = groupBy(categories, "categoryId");
+
+    //     return ids.map((id) => categoryMap[id] ?? []);
+    // })
+    // Categories(@Root() root: Recipe) {
+    //     return (dataLoader: DataLoader<number, Category[]>) =>
+    //         dataLoader.load(root.id)
+
+    // }
 
     //Returns all recipes for user
     @Query(() => User, { nullable: true })
@@ -39,12 +65,11 @@ export class RecipeResolver {
         @Arg("tags") tags: TagsInput,
         @Ctx() { req }: ServerContext
     ): Promise<Recipe | undefined> {
-        const recipe = await Recipe.create({
+        return await Recipe.create({
             ...recipe_input,
+            recipeCat: Category.findOne(tags.category_id),
             recipe_author: req.session!.userId
         }).save();
-        await this.addRecipeTags(recipe.id, tags);
-        return recipe;
     }
 
 
