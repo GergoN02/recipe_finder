@@ -1,9 +1,8 @@
-import { Field, ObjectType } from "type-graphql";
-import { TypeormLoader } from "type-graphql-dataloader";
+import { Ctx, Field, ObjectType } from "type-graphql";
 import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { Lazy } from "../types";
-import { Category } from "./Category";
-import { RecipeCategory } from "./RecipeCategory";
+import { ServerContext } from "../types";
+import { RecipeTags } from "./RecipeTags";
+import { Tag } from "./Tag";
 import { UserSavedRecipes } from "./UserSavedRecipe";
 
 
@@ -50,14 +49,12 @@ export class Recipe extends BaseEntity {
     @OneToMany(() => UserSavedRecipes, ur => ur.recipe)
     userConnection: Promise<UserSavedRecipes[]>
 
-    @Field(() => [Category])
-    @OneToMany(() => RecipeCategory, (recipeCat) => recipeCat.recipe, { lazy: true })
-    @TypeormLoader((recipeCat: RecipeCategory) => recipeCat.recipe_id, { selfKey: true })
-    recipeCat: Lazy<Category[]>;
+    @OneToMany(() => RecipeTags, rt => rt.tag)
+    tagConnection: Promise<RecipeTags[]>
 
-    // @Field(() => [Diet], { nullable: true })
-    // @OneToMany(() => RecipeDiet, dc => dc.recipe, { lazy: true })
-    // @TypeormLoader()
-    // diet: Lazy<RecipeDiet[]>;
+    @Field(() => [Tag], { nullable: true })
+    async recipeTags(@Ctx() { tagsLoader }: ServerContext): Promise<Tag[]> {
+        return tagsLoader!.load(this.id);
+    }
 
 }

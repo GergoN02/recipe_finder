@@ -1,14 +1,13 @@
 import { Request, Response } from "express";
-import { CategoryLoader } from "./utils/categoryLoader";
-import { dietLoader } from "./utils/dietLoader";
 import { RecipeLoader } from "./utils/recipeLoader";
+import { TagsLoader } from "./utils/tagsLoader";
 
 export type ServerContext = {
     req: Request; // Session cannot be undefined
     res: Response;
     recipeLoader?: ReturnType<typeof RecipeLoader>;
-    // categoryLoader?: ReturnType<typeof CategoryLoader>;
-    // dietLoader?: ReturnType<typeof dietLoader>
+    tagsLoader?: ReturnType<typeof TagsLoader>;
 };
+
 
 export type Lazy<T> = Promise<T> | T;

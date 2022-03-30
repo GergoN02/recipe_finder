@@ -1,15 +1,12 @@
-import { Arg, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from "type-graphql";
-import { Loader } from "type-graphql-dataloader";
+import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { In } from "typeorm";
-import { Category } from "../entities/Category";
 import { Recipe } from "../entities/Recipe";
-import { RecipeCategory } from "../entities/RecipeCategory";
-import { RecipeDiet } from "../entities/RecipeDiet";
+import { RecipeTags } from "../entities/RecipeTags";
+import { Tag } from "../entities/Tag";
 import { User } from "../entities/User";
 import { UserSavedRecipes } from "../entities/UserSavedRecipe";
 import { ServerContext } from "../types";
 import { RecipeInput, TagsInput } from "./ResTypes";
-import { groupBy } from "lodash";
 
 
 @Resolver()
@@ -64,28 +61,41 @@ export class RecipeResolver {
         @Arg("input") recipe_input: RecipeInput,
         @Arg("tags") tags: TagsInput,
         @Ctx() { req }: ServerContext
-    ): Promise<Recipe | undefined> {
-        return await Recipe.create({
+    ) {
+        const newRecipe = await Recipe.create({
             ...recipe_input,
-            recipeCat: Category.findOne(tags.category_id),
             recipe_author: req.session!.userId
         }).save();
+
+        const getTags = await Tag.find({
+            where: {
+                id: In(tags.tag_id)
+            }
+        })
+        for (const tag of getTags) {
+            await RecipeTags.create({
+                recipe_id: newRecipe.id,
+                tag_id: tag.id
+            }).save();
+        }
+
+        return await RecipeTags.find({
+            where: {
+                recipe_id: newRecipe.id
+            },
+            relations: ["recipe", "tag"]
+        })
+
     }
 
 
-    @Mutation(() => Boolean)
-    async addRecipeTags(
-        @Arg("recipe_id") recipe_id: number,
-        @Arg("tags") tags: TagsInput
-    ): Promise<Boolean> {
-
-        const { category_id, diet_id } = tags;
-        await RecipeCategory.create({ category_id, recipe_id }).save()
-        await RecipeDiet.create({ diet_id, recipe_id }).save();
-
-        return true;
-
-    }
+    // @Mutation(() => Boolean)
+    // async addRecipeTags(
+    //     @Arg("recipe_id") recipe_id: number,
+    //     @Arg("tags") tags: TagsInput
+    // ): Promise<Boolean> {
+    //     return true;
+    // }
 
 
     //Add Recipe to joint table

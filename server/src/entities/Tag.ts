@@ -1,12 +1,11 @@
 import { Field, ObjectType } from "type-graphql";
-import { TypeormLoader } from "type-graphql-dataloader";
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { RecipeCategory } from "./RecipeCategory";
+import { RecipeTags } from "./RecipeTags";
 
 
 @ObjectType()
 @Entity()
-export class Category extends BaseEntity {
+export class Tag extends BaseEntity {
 
     @Field()
     @PrimaryGeneratedColumn()
@@ -14,13 +13,12 @@ export class Category extends BaseEntity {
 
     @Field(() => String)
     @Column({ unique: true })
-    category_name!: string;
+    tag_name!: string;
 
     @Field(() => String)
     @Column({ nullable: true })
-    category_desc?: string;
+    tag_desc?: string;
 
-    @OneToMany(() => RecipeCategory, rc => rc.recipe)
-    @TypeormLoader()
-    recipeConnection: Promise<RecipeCategory[]>;
+    @OneToMany(() => RecipeTags, rt => rt.tag)
+    recipeConnection: Promise<RecipeTags[]>
 }

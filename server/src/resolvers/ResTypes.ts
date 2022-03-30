@@ -22,11 +22,8 @@ export class RecipeInput {
 @InputType()
 export class TagsInput {
 
-    @Field()
-    category_id: number
-
-    @Field()
-    diet_id: number
+    @Field(() => [Number])
+    tag_id: number[]
 }
 
 

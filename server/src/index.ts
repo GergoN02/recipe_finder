@@ -1,22 +1,22 @@
+import { ApolloServerPluginLandingPageDisabled, ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
 import { ApolloServer } from "apollo-server-express";
+import cors from "cors";
 import express from "express";
+import session from "express-session";
+import Redis from "ioredis";
 import { buildSchema } from "type-graphql";
+import { ApolloServerLoaderPlugin } from "type-graphql-dataloader";
 import { createConnection, getConnection } from "typeorm";
+import { COOKIE_NAME, __prod__ } from "./env-vars";
 import { HelloResolver } from "./resolvers/HelloRes";
 import { RecipeResolver } from "./resolvers/RecipeRes";
+import { TagsResolver } from "./resolvers/TagsRes";
 import { UserResolver } from "./resolvers/UserRes";
 import typeormConfig from "./typeorm-config";
-import Redis from "ioredis";
-import session from "express-session";
-import { COOKIE_NAME, __prod__ } from "./env-vars";
 import { ServerContext } from "./types";
-import cors from "cors";
-
-import { ApolloServerPluginLandingPageGraphQLPlayground, ApolloServerPluginLandingPageDisabled } from 'apollo-server-core';
 import { RecipeLoader } from "./utils/recipeLoader";
-import { CategoryResolver } from "./resolvers/CategoryRes";
-import { DietResolver } from "./resolvers/DietRes";
-import { ApolloServerLoaderPlugin } from "type-graphql-dataloader";
+import { TagsLoader } from './utils/tagsLoader';
+
 
 
 const main = async () => {
@@ -63,7 +63,6 @@ const main = async () => {
     )
 
 
-
     //Apollo GraphQL endpoint
     const apolloServer = new ApolloServer({
         plugins: [ // GraphQL old playground
@@ -75,10 +74,10 @@ const main = async () => {
             }),
         ],
         schema: await buildSchema({
-            resolvers: [HelloResolver, RecipeResolver, UserResolver, CategoryResolver, DietResolver],
+            resolvers: [HelloResolver, RecipeResolver, UserResolver, TagsResolver],
             validate: false,
         }),
-        context: ({ req, res }): ServerContext => ({ req, res, recipeLoader: RecipeLoader() })
+        context: ({ req, res }): ServerContext => ({ req, res, recipeLoader: RecipeLoader(), tagsLoader: TagsLoader() })
     });
 
     await apolloServer.start();
