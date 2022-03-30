@@ -43,9 +43,7 @@ export class RecipeResolver {
             ...recipe_input,
             recipe_author: req.session!.userId
         }).save();
-
         await this.addRecipeTags(recipe.id, tags);
-
         return recipe;
     }
 
