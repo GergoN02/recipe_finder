@@ -1,10 +1,10 @@
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
 import { In } from "typeorm";
 import { Recipe } from "../entities/Recipe";
-import { RecipeTags } from "../entities/RecipeTags";
+import { RecipeTags } from "../entities/joinTables/RecipeTags";
 import { Tag } from "../entities/Tag";
 import { User } from "../entities/User";
-import { UserSavedRecipes } from "../entities/UserSavedRecipe";
+import { UserSavedRecipes } from "../entities/joinTables/UserSavedRecipe";
 import { ServerContext } from "../types";
 import { RecipeInput, TagsInput } from "./ResTypes";
 
@@ -63,8 +63,7 @@ export class RecipeResolver {
         @Ctx() { req }: ServerContext
     ) {
         const newRecipe = await Recipe.create({
-            ...recipe_input,
-            recipe_author: req.session!.userId
+            ...recipe_input
         }).save();
 
         const getTags = await Tag.find({

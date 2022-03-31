@@ -1,24 +1,24 @@
 import { Field, ObjectType } from "type-graphql";
 import { BaseEntity, Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { RecipeTags } from "./joinTables/RecipeTags";
+import { RecipeIngredients } from "./joinTables/RecipeIngredients";
 
 
 @ObjectType()
 @Entity()
-export class Tag extends BaseEntity {
+export class Ingredient extends BaseEntity {
 
     @Field()
     @PrimaryGeneratedColumn()
     id!: number;
 
     @Field(() => String)
-    @Column({ unique: true })
-    tag_name!: string;
+    @Column()
+    ingredient_name!: string;
 
     @Field(() => String)
     @Column({ nullable: true })
-    tag_desc?: string;
+    ingredient_qty?: string;
 
-    @OneToMany(() => RecipeTags, rt => rt.tag)
-    recipeTagConnection: Promise<RecipeTags[]>
+    @OneToMany(() => RecipeIngredients, ri => ri.ingredient)
+    recipeIngredientConnection: Promise<RecipeIngredients[]>;
 }

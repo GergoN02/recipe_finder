@@ -1,9 +1,13 @@
 import { Ctx, Field, ObjectType } from "type-graphql";
 import { BaseEntity, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { ServerContext } from "../types";
-import { RecipeTags } from "./RecipeTags";
+import { RecipeAuthors } from "./joinTables/RecipeAuthor";
+import { RecipeTags } from "./joinTables/RecipeTags";
 import { Tag } from "./Tag";
-import { UserSavedRecipes } from "./UserSavedRecipe";
+import { UserSavedRecipes } from "./joinTables/UserSavedRecipe";
+import { RecipeIngredients } from "./joinTables/RecipeIngredients";
+import { User } from "./User";
+import { Ingredient } from "./Ingredient";
 
 
 @ObjectType() // For type-graphql API
@@ -16,23 +20,11 @@ export class Recipe extends BaseEntity {
 
     @Field()
     @Column()
-    recipe_author!: number;
-
-    @Field()
-    @Column()
     recipe_name!: string;
 
     @Field()
     @Column()
     recipe_desc!: string;
-
-    @Field(() => [String])
-    @Column("text", { array: true })
-    ingredients!: String[];
-
-    @Field(() => [String])
-    @Column("text", { array: true })
-    quantities!: string[];
 
     @Field()
     @Column({ nullable: true })
@@ -49,8 +41,24 @@ export class Recipe extends BaseEntity {
     @OneToMany(() => UserSavedRecipes, ur => ur.recipe)
     userConnection: Promise<UserSavedRecipes[]>
 
+    @OneToMany(() => RecipeAuthors, ra => ra.recipe)
+    authorConnection: Promise<RecipeAuthors[]>
+
+    @OneToMany(() => RecipeIngredients, ri => ri.recipe)
+    ingredientConnection: Promise<RecipeIngredients[]>;
+
     @OneToMany(() => RecipeTags, rt => rt.tag)
     tagConnection: Promise<RecipeTags[]>
+
+    @Field(() => [User], { nullable: true })
+    async recipeAuthors(@Ctx() { authorLoader }: ServerContext): Promise<User[]> {
+        return authorLoader.load(this.id);
+    }
+
+    @Field(() => [Ingredient], { nullable: true })
+    async recipeIngredients(@Ctx() { ingredientLoader }: ServerContext): Promise<Ingredient[]> {
+        return ingredientLoader.load(this.id);
+    }
 
     @Field(() => [Tag], { nullable: true })
     async recipeTags(@Ctx() { tagsLoader }: ServerContext): Promise<Tag[]> {
