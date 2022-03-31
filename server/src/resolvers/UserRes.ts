@@ -1,14 +1,29 @@
 import argon2 from "argon2";
-import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
-import { getCustomRepository } from "typeorm";
+import { Arg, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from "type-graphql";
 import { User } from "../entities/User";
-import { COOKIE_NAME } from "../env-vars";
-import { UserRepository } from "../repositories/UserRepo";
+import { COOKIE_NAME, FORGOT_PASS_PREFIX, ONE_DAY } from "../consts";
 import { ServerContext } from "../types";
+import { EMAIL_TAKEN, PASS_INCORRECT, PASS_INVALID, TOKEN_ERR_GENERIC, TOKEN_INVALID, UNAME_NOTFOUND, UNAME_TAKEN } from "../utils/errorHandling/errorMsg";
+import { validateRegister, validatePassword } from "../utils/errorHandling/validateRegister";
+import { sendMail } from "../utils/sendMail";
 import { LoginInfo, RegInfo, UserResponse } from "./ResTypes";
+import { v4 } from "uuid";
+import { UserRepository } from "../repositories/UserRepo";
+import { getCustomRepository } from "typeorm";
 
-@Resolver()
+@Resolver(User)
 export class UserResolver {
+
+    @FieldResolver(() => String)
+    email(@Root() user: User, @Ctx() { req }: ServerContext) {
+        //Field Access Authorized
+        if (req.session.userId === user.id) {
+            return user.email
+        }
+
+        //Field Access Unauthorized
+        return "";
+    }
 
     //WHO AM I
 
@@ -17,7 +32,7 @@ export class UserResolver {
         @Ctx() { req }: ServerContext
     ) {
         //not logged in
-        if (!req.session!.userId) {
+        if (!req.session.userId) {
             return null
         }
 
@@ -32,54 +47,26 @@ export class UserResolver {
         @Arg("user_info") user_info: RegInfo,
         @Ctx() { req }: ServerContext
     ): Promise<UserResponse> {
+        const userRepo = getCustomRepository(UserRepository);
+        const errors = validateRegister(user_info);
 
-        if (user_info.user_name.length <= 2) {
-            return {
-                errors: [{
-                    field: "username",
-                    message: "username needs to be at least 3 characters"
-                }]
-            };
-        }
-        if (!user_info.email.includes('@')) {
-            return {
-                errors: [{
-                    field: "email",
-                    message: "a valid email is required"
-                }]
-            };
-        }
-        if (user_info.password.length <= 2) {
-            return {
-                errors: [{
-                    field: "password",
-                    message: "password needs to be at least 3 characters"
-                }]
-            };
-        }
-        if (await User.findOne({ user_name: user_info.user_name })) {
-            return {
-                errors: [{
-                    field: "username",
-                    message: "user already exitst"
-                }]
-            }
+        if (errors) {
+            return { errors };
         }
 
-        if (await User.findOne({ email: user_info.email })) {
-            return {
-                errors: [{
-                    field: "email",
-                    message: "email already registered"
-                }]
-            }
+        if (await userRepo.findByUserName(user_info.user_name)) {
+            return { errors: UNAME_TAKEN }
+        }
+
+        if (await userRepo.findByEmail(user_info.email)) {
+            return { errors: EMAIL_TAKEN }
         }
 
         const hashedPass = await argon2.hash(user_info.password)
         const user = User.create({ user_name: user_info.user_name, email: user_info.email, password: hashedPass });
         await user.save();
 
-        req.session!.userId = user.id;
+        req.session.userId = user.id;
         return { user };
     }
 
@@ -91,29 +78,17 @@ export class UserResolver {
         @Ctx() { req }: ServerContext
     ): Promise<UserResponse> {
         const userRepo = getCustomRepository(UserRepository);
-        const user = user_info.username.includes('@') ? await userRepo.findByEmail(user_info.username) : await userRepo.findByUserName(user_info.username);
+        const user = await userRepo.findByUserName(user_info.username);
         if (!user) {
-            return {
-                errors: [{
-                    field: "username",
-                    message: "username or email doesn't exist"
-                }]
-            };
+            return { errors: UNAME_NOTFOUND };
         }
 
         const validate = await argon2.verify(user.password, user_info.password);
-
         if (!validate) {
-            return {
-                errors: [{
-                    field: "password",
-                    message: "Incorrect creditentials"
-                }]
-            };
+            return { errors: PASS_INCORRECT };
         }
 
-        req.session!.userId = user.id;
-
+        req.session.userId = user.id;
         return { user };
     }
 
@@ -134,5 +109,47 @@ export class UserResolver {
                 resolve(true);
             })
         })
+    }
+
+    @Mutation(() => Boolean)
+    async forgotPassword(
+        @Arg("email") email: string,
+        @Ctx() { redis }: ServerContext
+    ): Promise<Boolean> {
+        const userRepo = getCustomRepository(UserRepository);
+        const user = await userRepo.findByEmail(email);
+        if (!user) {
+            return true;
+        }
+        const token = v4();
+        await redis.set(FORGOT_PASS_PREFIX + token, user.id, 'ex', ONE_DAY);
+        const html = `<a> href="${process.env.FRONTEND_TARGET}/change-password/${token}"</a>`;
+        await sendMail(email, html);
+        return true;
+    }
+
+    @Mutation(() => UserResponse)
+    async changePassword(
+        @Arg("token") token: string,
+        @Arg("newPass") newPass: string,
+        @Ctx() { req, redis }: ServerContext
+    ): Promise<UserResponse> {
+        const validate = validatePassword(newPass);
+        if (validate) {
+            return { errors: validate }
+        }
+        const userId = await redis.get(FORGOT_PASS_PREFIX + token);
+        if (!userId) {
+            return { errors: TOKEN_INVALID }
+        }
+        const user = await User.findOne(parseInt(userId));
+        if (!user) {
+            return { errors: TOKEN_ERR_GENERIC }
+        }
+        user.password = await argon2.hash(newPass);
+        User.save(user);
+
+        req.session.userId = user.id;
+        return { user };
     }
 }

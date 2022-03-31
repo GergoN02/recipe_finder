@@ -14,9 +14,9 @@ export class Recipe extends BaseEntity {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Field()
+    @Field(() => Number)
     @Column()
-    recipe_author!: number;
+    author_id: number;
 
     @Field()
     @Column()
