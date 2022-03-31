@@ -7,7 +7,7 @@ import Redis from "ioredis";
 import { buildSchema } from "type-graphql";
 import { ApolloServerLoaderPlugin } from "type-graphql-dataloader";
 import { createConnection, getConnection } from "typeorm";
-import { COOKIE_NAME, __prod__ } from "./env-vars";
+import { COOKIE_NAME, ONE_DAY, __prod__ } from "./consts";
 import { HelloResolver } from "./resolvers/HelloRes";
 import { RecipeResolver } from "./resolvers/RecipeRes";
 import { TagsResolver } from "./resolvers/TagsRes";
@@ -22,7 +22,6 @@ import { TagsLoader } from './utils/dataLoaders/tagsLoader';
 
 
 const main = async () => {
-
 
     //DB connection with TypeORM
     const conn = await createConnection(typeormConfig);
@@ -53,7 +52,7 @@ const main = async () => {
                 disableTouch: true
             }),
             cookie: {
-                maxAge: 1000 * 60 * 60 * 24 * 365 * 10, // 10 years 
+                maxAge: ONE_DAY * 365 * 10, // 10 years 
                 httpOnly: true,
                 sameSite: "lax", //CSRF
                 secure: __prod__

@@ -9,30 +9,17 @@ import { ServerContext } from "../types";
 import { RecipeInput, TagsInput } from "./ResTypes";
 
 
-@Resolver()
+
+@Resolver(Recipe)
 export class RecipeResolver {
 
+    // **** NO PERMISSIONS **** //
 
-    //FIX THIS!!!
+    @Query(() => [Recipe], { nullable: true })
+    async getAllRecipes() {
+        return await Recipe.find();
+    }
 
-
-    // @FieldResolver()
-    // @Loader<number, Category[]>(async (ids: number[]) => {
-    //     const categories = await Category.find({
-    //         where: {
-    //             id: In(ids)
-    //         }
-    //     })
-
-    //     const categoryMap = groupBy(categories, "categoryId");
-
-    //     return ids.map((id) => categoryMap[id] ?? []);
-    // })
-    // Categories(@Root() root: Recipe) {
-    //     return (dataLoader: DataLoader<number, Category[]>) =>
-    //         dataLoader.load(root.id)
-
-    // }
 
     //Returns all recipes for user
     @Query(() => User, { nullable: true })
@@ -40,11 +27,6 @@ export class RecipeResolver {
         @Ctx() { req }: ServerContext
     ) {
         return User.findOne(req.session!.userId);
-    }
-
-    @Query(() => [Recipe], { nullable: true })
-    async getRecipes() {
-        return Recipe.find();
     }
 
     //Returns one recipe
