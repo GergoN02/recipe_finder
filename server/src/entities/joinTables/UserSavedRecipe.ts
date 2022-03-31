@@ -1,6 +1,6 @@
 import { BaseEntity, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
-import { Recipe } from "./Recipe";
-import { User } from "./User";
+import { Recipe } from "../Recipe";
+import { User } from "../User";
 
 
 @Entity()

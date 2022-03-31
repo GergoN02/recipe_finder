@@ -1,5 +1,5 @@
 import { In } from "typeorm";
-import { RecipeTags } from "../../entities/RecipeTags";
+import { RecipeTags } from "../../entities/joinTables/RecipeTags";
 import { Tag } from "../../entities/Tag";
 
 const DataLoader = require('dataloader');

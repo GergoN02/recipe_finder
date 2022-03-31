@@ -13,6 +13,9 @@ import { RecipeResolver } from "./resolvers/RecipeRes";
 import { TagsResolver } from "./resolvers/TagsRes";
 import { UserResolver } from "./resolvers/UserRes";
 import typeormConfig from "./typeorm-config";
+import { ServerContext } from "./types";
+import { AuthorsLoader } from './utils/dataLoaders/authorLoader';
+import { IngredientsLoader } from './utils/dataLoaders/ingredientLoader';
 import { RecipeLoader } from "./utils/dataLoaders/recipeLoader";
 import { TagsLoader } from './utils/dataLoaders/tagsLoader';
 
@@ -75,7 +78,14 @@ const main = async () => {
             resolvers: [HelloResolver, RecipeResolver, UserResolver, TagsResolver],
             validate: false,
         }),
-        context: ({ req, res }) => ({ req, res, redis, recipeLoader: RecipeLoader(), tagsLoader: TagsLoader() })
+        context: ({ req, res }): ServerContext => ({
+            req,
+            res,
+            recipeLoader: RecipeLoader(),
+            authorLoader: AuthorsLoader(),
+            ingredientLoader: IngredientsLoader(),
+            tagsLoader: TagsLoader()
+        })
     });
 
     await apolloServer.start();

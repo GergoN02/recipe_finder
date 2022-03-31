@@ -1,17 +1,33 @@
+import { In } from "typeorm";
+import { RecipeAuthors } from "../../entities/joinTables/RecipeAuthor";
 import { User } from "../../entities/User";
 
-import DataLoader from 'dataloader';
+const DataLoader = require('dataloader');
 
-const batchFunction = async (keys: readonly number[]) => {
-    const fetchedRecipes = await User.findByIds(keys as number[]);
-
-    const userMap: Record<number, User> = {};
-
-    fetchedRecipes.forEach(user => {
-        userMap[user.id] = user;
+const batchFunction = async (keys: number[]) => {
+    const fetchedTags = await RecipeAuthors.find({
+        join: {
+            alias: "RecipeAuthors",
+            innerJoinAndSelect: {
+                user: "RecipeAuthors.user"
+            }
+        },
+        where: {
+            recipe_id: In(keys)
+        }
     });
 
-    return keys.map(userId => userMap[userId]);
+    const usersMap: { [key: number]: User[] } = {};
+
+    fetchedTags.forEach(user => {
+        if (user.recipe_id in usersMap) {
+            usersMap[user.recipe_id].push((user as any).__user__);
+        } else {
+            usersMap[user.recipe_id] = [(user as any).__user__];
+        }
+    });
+
+    return keys.map(recipe_id => usersMap[recipe_id]);
 };
 
-export const RecipeLoader = () => new DataLoader(batchFunction);
+export const AuthorsLoader = () => new DataLoader(batchFunction);

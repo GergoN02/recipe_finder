@@ -1,6 +1,7 @@
 import { In } from "typeorm"
 import { Recipe } from "../../entities/Recipe";
-import { UserSavedRecipes } from "../../entities/UserSavedRecipe"
+import { UserSavedRecipes } from "../../entities/joinTables/UserSavedRecipe"
+
 
 const DataLoader = require('dataloader');
 
