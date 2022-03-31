@@ -8,6 +8,8 @@ import { UserSavedRecipes } from "./joinTables/UserSavedRecipe";
 import { RecipeIngredients } from "./joinTables/RecipeIngredients";
 import { User } from "./User";
 import { Ingredient } from "./Ingredient";
+import { RecipeSteps } from "./joinTables/RecipeSteps";
+import { Step } from "./Step";
 
 
 @ObjectType() // For type-graphql API
@@ -47,6 +49,9 @@ export class Recipe extends BaseEntity {
     @OneToMany(() => RecipeIngredients, ri => ri.recipe)
     ingredientConnection: Promise<RecipeIngredients[]>;
 
+    @OneToMany(() => RecipeSteps, rs => rs.recipe)
+    stepConnection: Promise<RecipeSteps[]>
+
     @OneToMany(() => RecipeTags, rt => rt.tag)
     tagConnection: Promise<RecipeTags[]>
 
@@ -58,6 +63,11 @@ export class Recipe extends BaseEntity {
     @Field(() => [Ingredient], { nullable: true })
     async recipeIngredients(@Ctx() { ingredientLoader }: ServerContext): Promise<Ingredient[]> {
         return ingredientLoader.load(this.id);
+    }
+
+    @Field(() => [Step], { nullable: true })
+    async recipeSteps(@Ctx() { stepLoader }: ServerContext): Promise<Step[]> {
+        return stepLoader.load(this.id);
     }
 
     @Field(() => [Tag], { nullable: true })

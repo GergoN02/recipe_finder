@@ -9,14 +9,22 @@ export class RecipeInput {
     @Field()
     recipe_desc!: string;
 
-    @Field(() => [String])
-    ingredients!: String[];
-
-    @Field(() => [String])
-    quantities!: string[];
-
     @Field({ nullable: true })
     recipe_img?: string;
+}
+
+@InputType()
+export class IngredientsInput {
+
+    @Field(() => [Number])
+    ingredient_id!: number[]
+}
+
+@InputType()
+export class StepsInput {
+
+    @Field(() => [Number])
+    step_id!: number[]
 }
 
 @InputType()

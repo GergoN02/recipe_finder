@@ -1,12 +1,10 @@
 import { Arg, Ctx, Mutation, Query, Resolver } from "type-graphql";
-import { In } from "typeorm";
-import { Recipe } from "../entities/Recipe";
-import { RecipeTags } from "../entities/joinTables/RecipeTags";
-import { Tag } from "../entities/Tag";
-import { User } from "../entities/User";
 import { UserSavedRecipes } from "../entities/joinTables/UserSavedRecipe";
+import { Recipe } from "../entities/Recipe";
+import { User } from "../entities/User";
 import { ServerContext } from "../types";
-import { RecipeInput, TagsInput } from "./ResTypes";
+import { RecipeAdder } from "./helpers/recipeAdder";
+import { IngredientsInput, RecipeInput, StepsInput, TagsInput } from "./ResTypes";
 
 
 
@@ -41,50 +39,32 @@ export class RecipeResolver {
     @Mutation(() => Recipe)
     async addNewRecipe(
         @Arg("input") recipe_input: RecipeInput,
+        @Arg("ingredients") ingredients: IngredientsInput,
+        @Arg("steps") steps: StepsInput,
         @Arg("tags") tags: TagsInput,
         @Ctx() { req }: ServerContext
     ) {
         const newRecipe = await Recipe.create({
-            ...recipe_input
+            ...recipe_input,
         }).save();
 
-        const getTags = await Tag.find({
+        const author: number = parseInt(req.session.userId);
+
+        await RecipeAdder(newRecipe, ingredients, steps, tags, author);
+
+        return Recipe.findOne({
             where: {
-                id: In(tags.tag_id)
+                id: newRecipe.id
             }
         })
-        for (const tag of getTags) {
-            await RecipeTags.create({
-                recipe_id: newRecipe.id,
-                tag_id: tag.id
-            }).save();
-        }
-
-        return await RecipeTags.find({
-            where: {
-                recipe_id: newRecipe.id
-            },
-            relations: ["recipe", "tag"]
-        })
-
     }
-
-
-    // @Mutation(() => Boolean)
-    // async addRecipeTags(
-    //     @Arg("recipe_id") recipe_id: number,
-    //     @Arg("tags") tags: TagsInput
-    // ): Promise<Boolean> {
-    //     return true;
-    // }
-
 
     //Add Recipe to joint table
     //For new recipe, addNewRecipe ==> get the returned JSON ==> addUserSavedRecipe with current session userId
     //For recipe already in DB (different author) ==> find recipe ==> addUserSavedRecipe with current session userId
 
     @Mutation(() => Boolean)
-    async addUserSavedRecipe(
+    async saveRecipeToUser(
         @Arg("recipe_id") recipe_id: number,
         @Arg("user_id") user_id: number
     ) {
