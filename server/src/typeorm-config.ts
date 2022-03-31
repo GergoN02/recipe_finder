@@ -8,6 +8,8 @@ import { RecipeTags } from "./entities/joinTables/RecipeTags";
 import { RecipeAuthors } from "./entities/joinTables/RecipeAuthor";
 import { Ingredient } from "./entities/Ingredient";
 import { RecipeIngredients } from "./entities/joinTables/RecipeIngredients";
+import { RecipeSteps } from "./entities/joinTables/RecipeSteps";
+import { Step } from "./entities/Step";
 
 export default {
     type: "postgres",
@@ -22,6 +24,8 @@ export default {
         RecipeAuthors,
         Ingredient,
         RecipeIngredients,
+        Step,
+        RecipeSteps,
         Tag,
         RecipeTags
     ],

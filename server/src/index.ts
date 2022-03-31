@@ -9,14 +9,16 @@ import { ApolloServerLoaderPlugin } from "type-graphql-dataloader";
 import { createConnection, getConnection } from "typeorm";
 import { COOKIE_NAME, ONE_DAY, __prod__ } from "./consts";
 import { HelloResolver } from "./resolvers/HelloRes";
+import { IngredientsResolver } from './resolvers/IngredientRes';
 import { RecipeResolver } from "./resolvers/RecipeRes";
+import { StepsResolver } from './resolvers/StepRes';
 import { TagsResolver } from "./resolvers/TagsRes";
 import { UserResolver } from "./resolvers/UserRes";
 import typeormConfig from "./typeorm-config";
-import { ServerContext } from "./types";
 import { AuthorsLoader } from './utils/dataLoaders/authorLoader';
 import { IngredientsLoader } from './utils/dataLoaders/ingredientLoader';
 import { RecipeLoader } from "./utils/dataLoaders/recipeLoader";
+import { StepsLoader } from './utils/dataLoaders/stepLoader';
 import { TagsLoader } from './utils/dataLoaders/tagsLoader';
 
 
@@ -75,15 +77,22 @@ const main = async () => {
             }),
         ],
         schema: await buildSchema({
-            resolvers: [HelloResolver, RecipeResolver, UserResolver, TagsResolver],
+            resolvers: [
+                HelloResolver,
+                RecipeResolver,
+                UserResolver,
+                IngredientsResolver,
+                StepsResolver,
+                TagsResolver],
             validate: false,
         }),
-        context: ({ req, res }): ServerContext => ({
+        context: ({ req, res }) => ({
             req,
             res,
             recipeLoader: RecipeLoader(),
             authorLoader: AuthorsLoader(),
             ingredientLoader: IngredientsLoader(),
+            stepLoader: StepsLoader(),
             tagsLoader: TagsLoader()
         })
     });

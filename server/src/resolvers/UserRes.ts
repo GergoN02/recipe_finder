@@ -1,15 +1,15 @@
 import argon2 from "argon2";
 import { Arg, Ctx, FieldResolver, Mutation, Query, Resolver, Root } from "type-graphql";
-import { User } from "../entities/User";
+import { getCustomRepository } from "typeorm";
+import { v4 } from "uuid";
 import { COOKIE_NAME, FORGOT_PASS_PREFIX, ONE_DAY } from "../consts";
+import { User } from "../entities/User";
+import { UserRepository } from "../repositories/UserRepo";
 import { ServerContext } from "../types";
-import { EMAIL_TAKEN, PASS_INCORRECT, PASS_INVALID, TOKEN_ERR_GENERIC, TOKEN_INVALID, UNAME_NOTFOUND, UNAME_TAKEN } from "../utils/errorHandling/errorMsg";
-import { validateRegister, validatePassword } from "../utils/errorHandling/validateRegister";
+import { EMAIL_TAKEN, PASS_INCORRECT, TOKEN_ERR_GENERIC, TOKEN_INVALID, UNAME_NOTFOUND, UNAME_TAKEN } from "../utils/errorHandling/errorMsg";
+import { validatePassword, validateRegister } from "../utils/errorHandling/validateRegister";
 import { sendMail } from "../utils/sendMail";
 import { LoginInfo, RegInfo, UserResponse } from "./ResTypes";
-import { v4 } from "uuid";
-import { UserRepository } from "../repositories/UserRepo";
-import { getCustomRepository } from "typeorm";
 
 @Resolver(User)
 export class UserResolver {
