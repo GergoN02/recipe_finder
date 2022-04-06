@@ -11,13 +11,9 @@ export class Step extends BaseEntity {
     @PrimaryGeneratedColumn()
     id!: number;
 
-    @Field(() => Number)
-    @Column({ nullable: true })
-    step_number!: number;
-
     @Field(() => String)
     @Column({ nullable: true })
-    step_desc?: string;
+    step_desc!: string;
 
     @OneToMany(() => RecipeSteps, rs => rs.step)
     recipeStepConnection: Promise<RecipeSteps[]>

@@ -16,6 +16,3 @@ export type ServerContext = {
     stepLoader?: ReturnType<typeof StepsLoader>
     tagsLoader?: ReturnType<typeof TagsLoader>;
 };
-
-
-export type Lazy<T> = Promise<T> | T;

@@ -17,10 +17,9 @@ export class StepsResolver {
 
     @Mutation(() => Step)
     async createStep(
-        @Arg("step_number") step_number: number,
         @Arg("step_desc") step_desc?: string
     ): Promise<Step> {
-        return Step.create({ step_number: step_number, step_desc: step_desc }).save();
+        return Step.create({ step_desc: step_desc }).save();
     }
 
     @Mutation(() => Boolean)

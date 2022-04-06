@@ -89,6 +89,7 @@ const main = async () => {
         context: ({ req, res }) => ({
             req,
             res,
+            redis,
             recipeLoader: RecipeLoader(),
             authorLoader: AuthorsLoader(),
             ingredientLoader: IngredientsLoader(),

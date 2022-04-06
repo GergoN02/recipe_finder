@@ -1,0 +1,101 @@
+[
+    {
+        "title": "Recipe Title",
+        "external_author": "",
+        "description": "Description",
+        "prep_time_minutes": 20,
+        "cook_time_mins": 25,
+        "total_time_minutes": 30,
+        "ingredients": [
+            {
+                "ingredient": "flour",
+                "quantity": "1 cup"
+            }
+        ],
+        "instructions": [
+            {
+                "step_number": 1,
+                "step_description": "step-content"
+            }
+        ],
+        "tags": [
+            {
+                "tag_name": "Vegetarian"
+            }
+        ],
+        "footnotes": [
+            "String",
+            "String"
+        ],
+        "original_url": "Link",
+        "photo_url": "Link",
+        "rating_stars": 4.5,
+        "review_count": 46
+    },
+    {
+        "title": "Recipe Title",
+        "external_author": "",
+        "description": "Description",
+        "prep_time_minutes": 20,
+        "cook_time_mins": 25,
+        "total_time_minutes": 30,
+        "ingredients": [
+            {
+                "ingredient": "flour",
+                "quantity": "1 cup"
+            }
+        ],
+        "instructions": [
+            {
+                "step_number": 1,
+                "step_description": "step-content"
+            }
+        ],
+        "tags": [
+            {
+                "tag_name": "Vegetarian"
+            }
+        ],
+        "footnotes": [
+            "String",
+            "String"
+        ],
+        "original_url": "Link",
+        "photo_url": "Link",
+        "rating_stars": 4.5,
+        "review_count": 46
+    },
+    {
+        "title": "Recipe Title",
+        "external_author": "",
+        "description": "Description",
+        "prep_time_minutes": 20,
+        "cook_time_mins": 25,
+        "total_time_minutes": 30,
+        "ingredients": [
+            {
+                "ingredient": "flour",
+                "quantity": "1 cup"
+            }
+        ],
+        "instructions": [
+            {
+                "step_number": 1,
+                "step_description": "step-content"
+            }
+        ],
+        "tags": [
+            {
+                "tag_name": "Vegetarian"
+            }
+        ],
+        "footnotes": [
+            "String",
+            "String"
+        ],
+        "original_url": "Link",
+        "photo_url": "Link",
+        "rating_stars": 4.5,
+        "review_count": 46
+    }
+]

@@ -22,15 +22,46 @@ export class Recipe extends BaseEntity {
 
     @Field()
     @Column()
-    recipe_name!: string;
+    recipe_title!: string;
+
+    @Column({ nullable: true })
+    external_author: string;
 
     @Field()
     @Column()
     recipe_desc!: string;
 
     @Field()
+    @Column()
+    prep_time_minutes!: number;
+
+    @Field()
+    @Column()
+    cook_time_minutes!: number;
+
+    @Field()
+    @Column()
+    total_time_minutes!: number;
+
+    @Field(() => [String])
+    @Column("text", { array: true, nullable: true })
+    footnotes: string[];
+
+    @Field()
     @Column({ nullable: true })
-    recipe_img?: string;
+    original_url: string;
+
+    @Field()
+    @Column({ nullable: true })
+    photo_url: string;
+
+    @Field()
+    @Column({ nullable: true })
+    rating_stars: number;
+
+    @Field()
+    @Column({ nullable: true })
+    review_count: number;
 
     @Field()
     @CreateDateColumn()
@@ -56,7 +87,13 @@ export class Recipe extends BaseEntity {
     tagConnection: Promise<RecipeTags[]>
 
     @Field(() => [User], { nullable: true })
-    async recipeAuthors(@Ctx() { authorLoader }: ServerContext): Promise<User[]> {
+    async recipeAuthors(@Ctx() { authorLoader }: ServerContext): Promise<User[] | {}> {
+
+        if (this.external_author) {
+            return {
+                author_name: this.external_author
+            }
+        }
         return authorLoader.load(this.id);
     }
 
