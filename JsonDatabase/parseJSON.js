@@ -61,28 +61,46 @@ function getIngredientsData ( ingredientsData ) {
     return result;
 }
 
-lines.forEach( jsonLine => {
-    const line = JSON.parse( jsonLine );
+function getInstructionsData ( instructionsData ) {
+    if ( !instructionsData ) {
+        return null;
+    }
 
-    const RecipeObject = {
-        "title": line[ "title" ],
-        "external_author": line[ "author" ],
-        "description": line[ "description" ],
-        "prep_time_minutes": line[ "prep_time_minutes" ],
-        "cook_time_minutes": line[ "cook_time_minutes" ],
-        "total_time_minutes": line[ "total_time_minutes" ],
+    let result = instructionsData.map( instruction => {
+        return {
+            "step_desc": instruction,
+        };
+    } );
 
-        "ingredients": getIngredientsData( line[ "ingredients" ] ),
-        "instructions": line[ "instructions" ],
-        "footnotes": line[ "footnotes" ],
+    result = result.filter( i => i !== undefined );
+    return result;
+};
 
-        "original_url": line[ "url" ],
-        "photo_url": line[ "photo_url" ],
-        "rating_stars": line[ "rating_stars" ],
-        "review_count": line[ "review_count" ],
-    };
+lines.forEach( bruh => {
+    const line = JSON.parse( bruh );
 
-    output[ "data" ].push( RecipeObject );
+    if ( line.cook_time_minutes !== 0 && line.prep_time_minutes !== 0 && line.total_time_minutes !== 0 ) {
+
+        const balls = {
+            "recipe_title": line[ "title" ],
+            "external_author": line[ "author" ],
+            "recipe_desc": line[ "description" ],
+            "prep_time_minutes": line[ "prep_time_minutes" ],
+            "cook_time_minutes": line[ "cook_time_minutes" ],
+            "total_time_minutes": line[ "total_time_minutes" ],
+
+            "ingredients": getIngredientsData( line[ "ingredients" ] ),
+            "instructions": getInstructionsData( line[ "instructions" ] ),
+            "footnotes": line[ "footnotes" ],
+
+            "original_url": line[ "url" ],
+            "photo_url": line[ "photo_url" ],
+            "rating_stars": line[ "rating_stars" ],
+            "review_count": line[ "review_count" ],
+        };
+
+        output[ "data" ].push( balls );
+    }
 } );
 
 fs.writeFileSync( "./output.json", JSON.stringify( output ) );
