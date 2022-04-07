@@ -13,7 +13,11 @@ export class Ingredient extends BaseEntity {
 
     @Field(() => String)
     @Column()
-    ingredient_name!: string;
+    ingredient_name?: string;
+
+    @Field(() => String)
+    @Column({ nullable: true })
+    ingredient_unit?: string;
 
     @Field(() => String)
     @Column({ nullable: true })

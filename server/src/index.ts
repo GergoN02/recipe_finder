@@ -8,6 +8,7 @@ import { buildSchema } from "type-graphql";
 import { ApolloServerLoaderPlugin } from "type-graphql-dataloader";
 import { createConnection, getConnection } from "typeorm";
 import { COOKIE_NAME, ONE_DAY, __prod__ } from "./consts";
+import { loadDb } from './DatabaseLoader/loadDB';
 import { HelloResolver } from "./resolvers/HelloRes";
 import { IngredientsResolver } from './resolvers/IngredientRes';
 import { RecipeResolver } from "./resolvers/RecipeRes";
@@ -30,8 +31,7 @@ const main = async () => {
     //Auto-run all pending migrations
     await conn.runMigrations();
 
-    // const em = conn.createEntityManager();
-    // const user = em.create(User, { user_name: "Gergo", password: "123456", user_type: UserType.ADMIN });
+    // await loadDb();
 
     //Express back-end server
     const app = express();

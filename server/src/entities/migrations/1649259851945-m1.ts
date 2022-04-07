@@ -1,17 +1,17 @@
 import {MigrationInterface, QueryRunner} from "typeorm";
 
-export class m11648764925538 implements MigrationInterface {
-    name = 'm11648764925538'
+export class m11649259851945 implements MigrationInterface {
+    name = 'm11649259851945'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "user_saved_recipes" ("user_id" integer NOT NULL, "recipe_id" integer NOT NULL, CONSTRAINT "PK_945cc61f1a5f6314aeb88f412d4" PRIMARY KEY ("user_id", "recipe_id"))`);
         await queryRunner.query(`CREATE TABLE "user" ("id" SERIAL NOT NULL, "user_name" character varying NOT NULL, "email" character varying NOT NULL, "password" character varying NOT NULL, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_d34106f8ec1ebaf66f4f8609dd6" UNIQUE ("user_name"), CONSTRAINT "UQ_e12875dfb3b1d92d7d7c5377e22" UNIQUE ("email"), CONSTRAINT "PK_cace4a159ff9f2512dd42373760" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "recipe_authors" ("recipe_id" integer NOT NULL, "user_id" integer NOT NULL, CONSTRAINT "PK_be7e11d574a2069ebcf2fb62530" PRIMARY KEY ("recipe_id", "user_id"))`);
-        await queryRunner.query(`CREATE TABLE "ingredient" ("id" SERIAL NOT NULL, "ingredient_name" character varying NOT NULL, "ingredient_qty" character varying, CONSTRAINT "PK_6f1e945604a0b59f56a57570e98" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "ingredient" ("id" SERIAL NOT NULL, "ingredient_name" character varying NOT NULL, "ingredient_unit" character varying NOT NULL, "ingredient_qty" character varying, CONSTRAINT "PK_6f1e945604a0b59f56a57570e98" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "recipe_ingredients" ("recipe_id" integer NOT NULL, "ingredient_id" integer NOT NULL, CONSTRAINT "PK_90484480b3b2978068565ae2a2f" PRIMARY KEY ("recipe_id", "ingredient_id"))`);
-        await queryRunner.query(`CREATE TABLE "step" ("id" SERIAL NOT NULL, "step_number" integer, "step_desc" character varying, CONSTRAINT "PK_70d386ace569c3d265e05db0cc7" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "step" ("id" SERIAL NOT NULL, "step_desc" character varying, CONSTRAINT "PK_70d386ace569c3d265e05db0cc7" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "recipe_steps" ("recipe_id" integer NOT NULL, "step_id" integer NOT NULL, CONSTRAINT "PK_ec17a5acb0989b07103f74c8a13" PRIMARY KEY ("recipe_id", "step_id"))`);
-        await queryRunner.query(`CREATE TABLE "recipe" ("id" SERIAL NOT NULL, "recipe_name" character varying NOT NULL, "recipe_desc" character varying NOT NULL, "recipe_img" character varying, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_e365a2fedf57238d970e07825ca" PRIMARY KEY ("id"))`);
+        await queryRunner.query(`CREATE TABLE "recipe" ("id" SERIAL NOT NULL, "recipe_title" character varying NOT NULL, "external_author" character varying, "recipe_desc" character varying NOT NULL, "prep_time_minutes" integer NOT NULL, "cook_time_minutes" integer NOT NULL, "total_time_minutes" integer NOT NULL, "footnotes" text array, "original_url" character varying, "photo_url" character varying, "rating_stars" character varying, "review_count" character varying, "created_at" TIMESTAMP NOT NULL DEFAULT now(), "updated_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "PK_e365a2fedf57238d970e07825ca" PRIMARY KEY ("id"))`);
         await queryRunner.query(`CREATE TABLE "recipe_tags" ("recipe_id" integer NOT NULL, "tag_id" integer NOT NULL, CONSTRAINT "PK_01345664192b9ae436dfb055aa3" PRIMARY KEY ("recipe_id", "tag_id"))`);
         await queryRunner.query(`CREATE TABLE "tag" ("id" SERIAL NOT NULL, "tag_name" character varying NOT NULL, "tag_desc" character varying, CONSTRAINT "UQ_c567d5f21442789d3fb85a53f07" UNIQUE ("tag_name"), CONSTRAINT "PK_8e4052373c579afc1471f526760" PRIMARY KEY ("id"))`);
         await queryRunner.query(`ALTER TABLE "user_saved_recipes" ADD CONSTRAINT "FK_09c1a552e056d905067fd22712f" FOREIGN KEY ("user_id") REFERENCES "user"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`);

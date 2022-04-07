@@ -7,14 +7,15 @@ export class DatabaseInput {
     total_time_minutes: number;
     ingredients: [{
         ingredient: string;
+        unit: string;
         quantity: string;
     }];
     instructions: [{
-        step_description: string;
+        step_desc: string;
     }];
     footnotes: string[];
     original_url: string;
     photo_url: string;
-    rating_stars: number;
-    review_count: 46;
+    rating_stars: string;
+    review_count: string;
 }

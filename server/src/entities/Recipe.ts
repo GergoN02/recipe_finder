@@ -57,11 +57,11 @@ export class Recipe extends BaseEntity {
 
     @Field()
     @Column({ nullable: true })
-    rating_stars: number;
+    rating_stars: string;
 
     @Field()
     @Column({ nullable: true })
-    review_count: number;
+    review_count: string;
 
     @Field()
     @CreateDateColumn()
@@ -90,9 +90,11 @@ export class Recipe extends BaseEntity {
     async recipeAuthors(@Ctx() { authorLoader }: ServerContext): Promise<User[] | {}> {
 
         if (this.external_author) {
-            return {
-                author_name: this.external_author
-            }
+            return [
+                {
+                    user_name: this.external_author,
+                }
+            ]
         }
         return authorLoader.load(this.id);
     }
